@@ -24,7 +24,7 @@ class Program
         car.steer = 0;
         car.handbrake = 0;
 
-        car.gear_up = false;
+        car.gear_up = true;
         car.gear_dn = false;
         car.drs = false;
         car.kers = false;
@@ -93,7 +93,9 @@ class Program
                                     car.gear_up = false;
                                 }
                                 else{
-                                    car.gear_up = true;
+                                    if (car_data.rpm > 11000){
+                                        car.gear_up = true;
+                                    }
                                 }
                                 
                                 car.gear_dn = false;
@@ -211,7 +213,9 @@ public struct cai_car_data {
     public Vector3 local_velocity;
     public Vector3 local_angular_velocity;
     public float cg_height;
+    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 5)]
     public float[] car_damage;
+    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
     public cai_wheel_data[] wheels;
     public float turbo_boost;
     public float final_ff;
