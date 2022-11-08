@@ -10,6 +10,14 @@ using System.Runtime.Serialization;
 
 class Program
 {
+    public static void RewriteLine(int lineNumber, String newText)
+    {
+        int currentLineCursor = Console.CursorTop;
+        Console.SetCursorPosition(0, currentLineCursor - lineNumber);
+        Console.Write(newText); Console.WriteLine(new string(' ', Console.WindowWidth - newText.Length)); 
+        Console.SetCursorPosition(0, currentLineCursor);
+    }
+
     static void Main(string[] args)
     {
         cai_car_controls car;
@@ -19,8 +27,8 @@ class Program
         car_data.packet_id = 0;
 
         car.gas = 0;
-        car.brake = 1;
-        car.clutch = 0;
+        car.brake = 0;
+        car.clutch = 1;
         car.steer = 0;
         car.handbrake = 0;
 
@@ -57,6 +65,37 @@ class Program
         car.teleport_pos = new Vector3(0,0,0);
         car.teleport_dir = new Vector3(0,0,0);
 
+        Console.Clear();
+        Console.CursorVisible = false;
+        Console.WriteLine("Gas: " + 0);
+        Console.WriteLine("Brake: " + 0);
+        Console.WriteLine("Clutch: " + 0);
+        Console.WriteLine("Steer: " + 0);
+        Console.WriteLine("Handbrake: " + 0);
+        Console.WriteLine("Fuel: " + 0);
+        Console.WriteLine("Gear: " + 0);
+        Console.WriteLine("RPM: " + 0);
+        Console.WriteLine("Speed KMH: " + 0);
+        Console.WriteLine("Velocity: " + 0);
+        Console.WriteLine("Accel G: " + 0);
+        Console.WriteLine("Look: " + 0);
+        Console.WriteLine("Position: " + 0);
+        Console.WriteLine("Local Velocity: " + 0);
+        Console.WriteLine("Local Angular Velocity: " + 0);
+        Console.WriteLine("CG Height: " + 0);
+        Console.WriteLine("Car Damage: " + 0);
+        Console.WriteLine("Wheels: " + 0);
+        Console.WriteLine("Turbo Boost: " + 0);
+        Console.WriteLine("Pit Limiter: " + 0);
+        Console.WriteLine("ABS in Action: false");
+        Console.WriteLine("TC in Action: false");
+        Console.WriteLine("Lap time ms: " + 0);
+        Console.WriteLine("Best Lap Time ms: " + 0);
+        Console.WriteLine("Drivertrain Torque: " + 0);
+        Console.WriteLine("Spline Position: " + 0);
+        Console.WriteLine("Collision Depth: " + 0);
+        Console.WriteLine("Collision Counter: " + 0);
+
         int size = System.Runtime.InteropServices.Marshal.SizeOf(typeof(cai_car_controls));
 
         try
@@ -77,27 +116,59 @@ class Program
                                 car_data = (cai_car_data) Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(cai_car_data));
                                 handle.Free();
 
-                                Console.WriteLine(car_data.packet_id);
+                                TimeSpan t = TimeSpan.FromMilliseconds(car_data.lap_time_ms);
+                                string answer = string.Format("{0:D2}h:{1:D2}m:{2:D2}s:{3:D3}ms", 
+                                                        t.Hours, 
+                                                        t.Minutes, 
+                                                        t.Seconds, 
+                                                        t.Milliseconds);
+                                TimeSpan tb = TimeSpan.FromMilliseconds(car_data.best_lap_time_ms);
+                                string answerB = string.Format("{0:D2}h:{1:D2}m:{2:D2}s:{3:D3}ms", 
+                                                        tb.Hours, 
+                                                        tb.Minutes, 
+                                                        tb.Seconds, 
+                                                        tb.Milliseconds);
+
+                                RewriteLine(28,"Gas: " + car_data.gas);
+                                RewriteLine(27,"Brake: " + car_data.brake);
+                                RewriteLine(26,"Clutch: " + car_data.clutch);
+                                RewriteLine(25,"Steer: " + car_data.steer);
+                                RewriteLine(24,"Handbrake: " + car_data.handbrake);
+                                RewriteLine(23,"Fuel: " + car_data.fuel);
+                                RewriteLine(22,"Gear: " + car_data.gear);
+                                RewriteLine(21,"RPM: " + car_data.rpm);
+                                RewriteLine(20,"Speed KMH: " + car_data.speed_kmh);
+                                RewriteLine(19,"Velocity: " + car_data.velocity);
+                                RewriteLine(18,"Accel G: " + car_data.acc_g);
+                                RewriteLine(17,"Look: " + car_data.look);
+                                RewriteLine(16,"Position: " + car_data.position);
+                                RewriteLine(15,"Local Velocity: " + car_data.local_velocity);
+                                RewriteLine(14,"Local Angular Velocity: " + car_data.local_angular_velocity);
+                                RewriteLine(13,"CG Height: " + car_data.cg_height);
+                                RewriteLine(12,"Car Damage: " + car_data.car_damage);
+                                RewriteLine(11,"Wheels: " + car_data.wheels);
+                                RewriteLine(10,"Turbo Boost: " + car_data.turbo_boost);
+                                RewriteLine(9,"Pit Limiter: " + car_data.pit_limiter);
+                                RewriteLine(8,"ABS in Action: " + car_data.abs_in_action);
+                                RewriteLine(7,"TC in Action: " + car_data.traction_control_in_action);
+                                RewriteLine(6,"Lap time ms: " + answer);
+                                RewriteLine(5,"Best Lap Time ms: " + answerB);
+                                RewriteLine(4,"Drivertrain Torque: " + car_data.drivetrain_torque);
+                                RewriteLine(3,"Spline Position: " + car_data.spline_position);
+                                RewriteLine(2,"Collision Depth: " + car_data.collision_depth);
+                                RewriteLine(1,"Collision Counter: " + car_data.collision_counter);
                             }
 
                             if (car_data.packet_id != last_packet_id){
                                 last_packet_id = car_data.packet_id;
                             
-                                car.gas = (float)1;
+                                car.gas = (float)0.025;
                                 car.brake = 0;
                                 car.clutch = 1;
-                                car.steer = 0;
+                                car.steer = (float)0.1;
                                 car.handbrake = 0;
 
-                                if (car.gear_up == true){
-                                    car.gear_up = false;
-                                }
-                                else{
-                                    if (car_data.rpm > 11000){
-                                        car.gear_up = true;
-                                    }
-                                }
-                                
+                                car.gear_up = true;
                                 car.gear_dn = false;
                                 car.drs = false;
                                 car.kers = false;
